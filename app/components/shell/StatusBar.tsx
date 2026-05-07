@@ -24,7 +24,7 @@ export function StatusBar({ file, state, onReset }: StatusBarProps) {
       className="sticky top-0 z-20 border-b backdrop-blur"
       style={{ borderColor: "var(--color-line)", background: "color-mix(in oklch, var(--color-bg-2), transparent 10%)" }}
     >
-      <div className="max-w-[1400px] mx-auto px-5 py-2 flex items-center gap-4 flex-wrap text-[11px] cb-mono"
+      <div className="max-w-[1400px] mx-auto px-3 sm:px-5 py-2 flex items-center gap-3 sm:gap-4 flex-wrap text-[11px] cb-mono"
            style={{ color: "var(--color-ink-2)" }}>
         {/* logo */}
         <button
@@ -37,22 +37,22 @@ export function StatusBar({ file, state, onReset }: StatusBarProps) {
             <span className="text-[11px] font-bold" style={{ color: "var(--color-bg)" }}>▦</span>
           </div>
           <span className="font-sans font-semibold text-[13px] tracking-tight">chartboard</span>
-          <span style={{ color: "var(--color-ink-4)" }}>v0.4.1</span>
+          <span className="hidden sm:inline" style={{ color: "var(--color-ink-4)" }}>v0.4.1</span>
         </button>
 
-        <span style={{ color: "var(--color-ink-4)" }}>│</span>
+        <span className="hidden sm:inline" style={{ color: "var(--color-ink-4)" }}>│</span>
 
         {/* breadcrumb */}
         <div className="flex items-center gap-1.5 flex-1 min-w-0">
           <span style={{ color: "var(--color-ink-4)" }}>~/</span>
           {file ? (
             <>
-              <span style={{ color: "var(--color-ink-2)" }}>workspace</span>
-              <span style={{ color: "var(--color-ink-4)" }}>/</span>
-              <span style={{ color: "var(--color-ink)" }}>{file.filename}</span>
-              <span className="ml-2.5" style={{ color: "var(--color-ink-4)" }}>{file.rows.toLocaleString()} rows</span>
-              <span style={{ color: "var(--color-ink-4)" }}>·</span>
-              <span style={{ color: "var(--color-ink-4)" }}>{file.columns.length} cols</span>
+              <span className="hidden sm:inline" style={{ color: "var(--color-ink-2)" }}>workspace</span>
+              <span className="hidden sm:inline" style={{ color: "var(--color-ink-4)" }}>/</span>
+              <span className="truncate max-w-[110px] sm:max-w-none" style={{ color: "var(--color-ink)" }}>{file.filename}</span>
+              <span className="ml-2 hidden sm:inline" style={{ color: "var(--color-ink-4)" }}>{file.rows.toLocaleString()} rows</span>
+              <span className="hidden sm:inline" style={{ color: "var(--color-ink-4)" }}>·</span>
+              <span className="hidden sm:inline" style={{ color: "var(--color-ink-4)" }}>{file.columns.length} cols</span>
             </>
           ) : (
             <span style={{ color: "var(--color-ink-3)" }}>workspace/<span className="cb-caret" /></span>

@@ -69,13 +69,13 @@ export function SuggestionsGrid({ analysis, onContinue }: SuggestionsGridProps) 
   }, [cursor, filtered, currentFile, addToDashboard, isInDashboard, onContinue]);
 
   return (
-    <div className="grid gap-6" style={{ gridTemplateColumns: "1fr 360px" }}>
+    <div className="grid gap-6 grid-cols-1 sm:grid-cols-[1fr_360px]">
       <div>
         <div className="cb-mono text-[11px] tracking-wider" style={{ color: "var(--color-ink-4)" }}>
           [03] · COMPOSE
         </div>
         <div className="flex items-baseline justify-between mt-1.5 mb-4">
-          <h2 className="text-[32px] font-semibold tracking-tight m-0">
+          <h2 className="text-[24px] sm:text-[32px] font-semibold tracking-tight m-0">
             {analysis.suggestions.length} views proposed.
           </h2>
           {onContinue && (
@@ -138,9 +138,8 @@ export function SuggestionsGrid({ analysis, onContinue }: SuggestionsGridProps) 
                 layout
                 onMouseEnter={() => setCursor(i)}
                 onClick={() => currentFile && !added && addToDashboard(s, currentFile.file_id)}
-                className="grid items-center gap-3.5 px-4 py-3.5 cursor-pointer relative"
+                className="grid items-center gap-x-3.5 gap-y-1 px-3 sm:px-4 py-3 sm:py-3.5 cursor-pointer relative grid-cols-[32px_1fr_auto] sm:grid-cols-[44px_1fr_140px_90px_110px]"
                 style={{
-                  gridTemplateColumns: "44px 1fr 140px 90px 110px",
                   borderTop: i === 0 ? 0 : "1px solid var(--color-line-soft)",
                   background: active ? "var(--color-bg-2)" : "transparent",
                 }}
@@ -175,11 +174,11 @@ export function SuggestionsGrid({ analysis, onContinue }: SuggestionsGridProps) 
                   </div>
                 </div>
 
-                <div style={{ color: "var(--color-accent)" }}>
+                <div className="hidden sm:block" style={{ color: "var(--color-accent)" }}>
                   <MiniChart type={s.chart_type} data={previewFor(s)} color="currentColor" />
                 </div>
 
-                <div className="cb-mono text-[11px]">
+                <div className="hidden sm:block cb-mono text-[11px]">
                   <div className="mb-1" style={{ color: "var(--color-ink-4)" }}>conf [—]</div>
                   <div className="flex gap-[1.5px]">
                     {Array.from({ length: 10 }).map((_, k) => (
@@ -225,7 +224,7 @@ export function SuggestionsGrid({ analysis, onContinue }: SuggestionsGridProps) 
       </div>
 
       {/* side rail */}
-      <aside className="sticky top-20 h-fit">
+      <aside className="sm:sticky sm:top-20 sm:h-fit">
         <div className="cb-mono text-[11px] tracking-wider mb-2" style={{ color: "var(--color-ink-4)" }}>
           PINNED · {dashboardCharts.length}
         </div>

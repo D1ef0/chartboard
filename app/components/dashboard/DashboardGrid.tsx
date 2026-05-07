@@ -3,16 +3,16 @@ import { useAppStore } from "../../lib/store";
 import { ChartRenderer } from "./ChartRenderer";
 import type { DashboardChart } from "../../types";
 
-const SLOTS: React.CSSProperties[] = [
-  { gridColumn: "span 4", gridRow: "span 2" }, // hero
-  { gridColumn: "span 2", gridRow: "span 1" },
-  { gridColumn: "span 2", gridRow: "span 1" },
-  { gridColumn: "span 3", gridRow: "span 1" },
-  { gridColumn: "span 3", gridRow: "span 1" },
-  { gridColumn: "span 2", gridRow: "span 1" },
-  { gridColumn: "span 4", gridRow: "span 1" },
-  { gridColumn: "span 3", gridRow: "span 1" },
-  { gridColumn: "span 3", gridRow: "span 1" },
+const SLOT_CLASSES = [
+  "col-span-full sm:col-span-4 sm:row-span-2", // hero
+  "col-span-full sm:col-span-2",
+  "col-span-full sm:col-span-2",
+  "col-span-full sm:col-span-3",
+  "col-span-full sm:col-span-3",
+  "col-span-full sm:col-span-2",
+  "col-span-full sm:col-span-4",
+  "col-span-full sm:col-span-3",
+  "col-span-full sm:col-span-3",
 ];
 
 export function DashboardGrid() {
@@ -37,7 +37,7 @@ export function DashboardGrid() {
   return (
     <div>
       {currentFile && (
-        <div className="grid gap-2.5 mb-4" style={{ gridTemplateColumns: "repeat(4, 1fr)" }}>
+        <div className="grid gap-2.5 mb-4 grid-cols-2 sm:grid-cols-4">
           {[
             { l: "rows analyzed", v: currentFile.rows.toLocaleString(), d: "+0" },
             { l: "views pinned", v: dashboardCharts.length, d: `${Math.max(dashboardCharts.length - 1, 0)} secondary` },
@@ -60,16 +60,13 @@ export function DashboardGrid() {
       )}
 
       <div
-        className="grid gap-3.5"
-        style={{
-          gridTemplateColumns: "repeat(6, 1fr)",
-          gridAutoRows: "minmax(150px, auto)",
-        }}
+        className="grid gap-3.5 grid-cols-1 sm:grid-cols-6"
+        style={{ gridAutoRows: "minmax(150px, auto)" }}
       >
         <AnimatePresence>
-          <ChartCard key={hero.id} chart={hero} index={0} hero onRemove={() => removeFromDashboard(hero.id)} />
+          <ChartCard key={hero.id} chart={hero} index={0} slotClass={SLOT_CLASSES[0]} hero onRemove={() => removeFromDashboard(hero.id)} />
           {rest.map((c, i) => (
-            <ChartCard key={c.id} chart={c} index={i + 1} onRemove={() => removeFromDashboard(c.id)} />
+            <ChartCard key={c.id} chart={c} index={i + 1} slotClass={SLOT_CLASSES[Math.min(i + 1, SLOT_CLASSES.length - 1)]} onRemove={() => removeFromDashboard(c.id)} />
           ))}
         </AnimatePresence>
       </div>
@@ -78,9 +75,8 @@ export function DashboardGrid() {
 }
 
 function ChartCard({
-  chart, index, hero, onRemove,
-}: { chart: DashboardChart; index: number; hero?: boolean; onRemove: () => void }) {
-  const slot = hero ? SLOTS[0] : SLOTS[Math.min(index, SLOTS.length - 1)];
+  chart, index, hero, slotClass, onRemove,
+}: { chart: DashboardChart; index: number; hero?: boolean; slotClass: string; onRemove: () => void }) {
   const s = chart.suggestion;
 
   return (
@@ -89,8 +85,8 @@ function ChartCard({
       initial={{ opacity: 0, scale: 0.96 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.96 }}
+      className={`flex flex-col ${slotClass}`}
       style={{
-        ...slot,
         border: "1px solid var(--color-line)",
         borderRadius: 8,
         background: "var(--color-bg-2)",
@@ -98,7 +94,6 @@ function ChartCard({
         position: "relative",
         overflow: "hidden",
       }}
-      className="flex flex-col"
     >
       <CornerTicks />
       <div className="flex items-start justify-between gap-2.5 mb-2.5">
@@ -114,8 +109,8 @@ function ChartCard({
               [{String(index + 1).padStart(2, "0")}]
             </span>
             <span className="uppercase">{s.chart_type}</span>
-            <span>·</span>
-            <span>{s.parameters.x_axis} → {s.parameters.y_axis ?? "—"}</span>
+            <span className="hidden sm:inline">·</span>
+            <span className="hidden sm:inline">{s.parameters.x_axis} → {s.parameters.y_axis ?? "—"}</span>
             {hero && <span className="ml-1.5 tracking-wider" style={{ color: "var(--color-accent)" }}>HERO</span>}
           </div>
           <div className="font-semibold tracking-tight" style={{ fontSize: hero ? 22 : 15 }}>

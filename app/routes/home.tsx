@@ -136,7 +136,7 @@ export default function Home() {
 
           {state === "error" && (
             <motion.div key="error" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                        className="max-w-[760px] mx-auto px-5 py-14">
+                        className="max-w-[760px] mx-auto px-4 sm:px-5 py-8 sm:py-14">
               <div className="cb-mono text-[11px] tracking-wider" style={{ color: "var(--color-danger)" }}>
                 [!!] · STDERR
               </div>
@@ -177,8 +177,8 @@ export default function Home() {
 
           {state === "ready" && analysis && (
             <motion.div key="ready" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                        className="max-w-[1400px] mx-auto px-5 py-7">
-              <div className="flex items-center gap-2 mb-5 cb-mono text-[12px]">
+                        className="max-w-[1400px] mx-auto px-3 sm:px-5 py-5 sm:py-7">
+              <div className="flex items-center flex-wrap gap-2 mb-5 cb-mono text-[12px]">
                 {(["compose", "dashboard"] as const).map((v) => (
                   <button
                     key={v}

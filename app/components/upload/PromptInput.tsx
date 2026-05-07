@@ -51,9 +51,9 @@ export function PromptInput({ filename, rows, columns, columnNames, columnTypes,
   };
 
   return (
-    <div className="max-w-[920px] mx-auto px-5 py-8">
+    <div className="max-w-[920px] mx-auto px-4 sm:px-5 py-6 sm:py-8">
       <div
-        className="flex items-center gap-3.5 px-4 py-3 rounded-lg cb-mono text-[12px]"
+        className="flex items-center flex-wrap gap-x-3.5 gap-y-1.5 px-4 py-3 rounded-lg cb-mono text-[12px]"
         style={{ border: "1px solid var(--color-line)", background: "var(--color-bg-2)" }}
       >
         {onBack && (
@@ -62,7 +62,7 @@ export function PromptInput({ filename, rows, columns, columnNames, columnTypes,
           </button>
         )}
         <span style={{ color: "var(--color-ink-4)" }}>file:</span>
-        <span style={{ color: "var(--color-ink)" }}>{filename}</span>
+        <span className="truncate max-w-[130px] sm:max-w-none" style={{ color: "var(--color-ink)" }}>{filename}</span>
         <span style={{ color: "var(--color-ink-4)" }}>·</span>
         <span style={{ color: "var(--color-ink-2)" }}>{rows.toLocaleString()} rows</span>
         <span style={{ color: "var(--color-ink-4)" }}>·</span>
@@ -101,7 +101,7 @@ export function PromptInput({ filename, rows, columns, columnNames, columnTypes,
         <div className="cb-mono text-[11px] tracking-wider" style={{ color: "var(--color-ink-4)" }}>
           [02] · INSTRUCT
         </div>
-        <h2 className="text-[32px] font-semibold tracking-tight my-1.5 mb-4">
+        <h2 className="text-[22px] sm:text-[32px] font-semibold tracking-tight my-1.5 mb-4">
           What should the analyst look for?
         </h2>
       </div>
@@ -140,7 +140,7 @@ export function PromptInput({ filename, rows, columns, columnNames, columnTypes,
         />
       </div>
 
-      <div className="flex items-center gap-3 mt-4">
+      <div className="flex items-center flex-wrap gap-3 mt-4">
         <button
           type="button"
           onClick={() => onAnalyze(prompt)}
@@ -158,7 +158,7 @@ export function PromptInput({ filename, rows, columns, columnNames, columnTypes,
         >
           skip · auto-analyze
         </button>
-        <span className="ml-auto cb-mono text-[11px]" style={{ color: "var(--color-ink-4)" }}>
+        <span className="ml-auto hidden sm:inline cb-mono text-[11px]" style={{ color: "var(--color-ink-4)" }}>
           analyst: <span style={{ color: "var(--color-ink-2)" }}>haiku-4.5</span> · est. 6–9s
         </span>
       </div>

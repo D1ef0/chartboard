@@ -33,12 +33,12 @@ export function FileUploader({ onFile, disabled }: FileUploaderProps) {
   });
 
   return (
-    <div className="max-w-[920px] mx-auto px-5 pt-14 pb-10">
+    <div className="max-w-[920px] mx-auto px-4 sm:px-5 pt-8 sm:pt-14 pb-10">
       <div className="mb-7">
         <div className="cb-mono text-[11px] tracking-wider" style={{ color: "var(--color-ink-4)" }}>
           [01] · INPUT
         </div>
-        <h1 className="text-[56px] leading-[1.05] font-semibold tracking-[-0.04em] mt-2 mb-1">
+        <h1 className="text-[36px] sm:text-[56px] leading-[1.05] font-semibold tracking-[-0.04em] mt-2 mb-1">
           Drop a sheet.<br />
           <span style={{ color: "var(--color-ink-3)" }}>
             Get a dashboard in <span style={{ color: "var(--color-accent)" }}>one breath</span>.
@@ -71,14 +71,14 @@ export function FileUploader({ onFile, disabled }: FileUploaderProps) {
         </div>
 
         <div
-          className="grid items-center gap-4 px-6 py-8 rounded-lg min-h-[180px]"
+          className="flex flex-col sm:grid items-center gap-4 px-4 sm:px-6 py-6 sm:py-8 rounded-lg min-h-[140px] sm:min-h-[180px]"
           style={{
             gridTemplateColumns: "auto 1fr auto",
             border: "1px solid var(--color-line-soft)",
             background: "var(--color-bg)",
           }}
         >
-          <pre className="cb-mono text-[11px] leading-[1.3] p-1.5 rounded-md whitespace-pre"
+          <pre className="hidden sm:block cb-mono text-[11px] leading-[1.3] p-1.5 rounded-md whitespace-pre"
                style={{
                  color: "var(--color-ink-3)",
                  border: "1px solid var(--color-line)",
@@ -102,10 +102,10 @@ export function FileUploader({ onFile, disabled }: FileUploaderProps) {
               <span style={{ color: "var(--color-ink-2)" }}>10MB</span>
             </div>
           </div>
-          <div className="self-stretch flex flex-col gap-2 justify-center">
+          <div className="sm:self-stretch flex flex-col gap-2 sm:justify-center w-full sm:w-auto">
             <button
               type="button"
-              className="px-4 py-2 rounded-md cb-mono text-[12px] font-semibold inline-flex items-center gap-2"
+              className="px-4 py-2 rounded-md cb-mono text-[12px] font-semibold inline-flex items-center gap-2 justify-center sm:justify-start"
               style={{ background: "var(--color-ink)", color: "var(--color-bg)" }}
             >
               browse <span className="cb-kbd" style={{ background: "var(--color-bg-3)" }}>⏎</span>
