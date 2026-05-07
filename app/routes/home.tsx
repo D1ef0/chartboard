@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { RotateCcw, Sparkles, Download, FileDown } from "lucide-react";
 import { FileUploader } from "../components/upload/FileUploader";
 import { LoadingState } from "../components/upload/LoadingState";
+import { PromptInput } from "../components/upload/PromptInput";
 import { SuggestionsGrid } from "../components/analysis/SuggestionsGrid";
 import { DashboardGrid } from "../components/dashboard/DashboardGrid";
 import { uploadFile, analyzeFile, downloadDataset } from "../lib/api";
@@ -19,6 +20,7 @@ export default function Home() {
   const { state, analysis, currentFile, reset, setState, setFile, setAnalysis } = useAppStore();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [downloading, setDownloading] = useState<"csv" | "xlsx" | null>(null);
+  const [lastPrompt, setLastPrompt] = useState<string>("");
 
   const handleDownload = async (format: "csv" | "xlsx") => {
     if (!currentFile || downloading) return;
@@ -36,20 +38,28 @@ export default function Home() {
   const handleFile = async (file: File) => {
     setErrorMsg(null);
     setState("uploading");
-
     try {
       const uploadResult = await uploadFile(file);
       setFile(uploadResult);
+      setState("prompting");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Error desconocido";
+      setErrorMsg(msg);
+      setState("error");
+    }
+  };
 
-      // minimum loading feel
+  const handleAnalyze = async (prompt: string) => {
+    if (!currentFile) return;
+    setLastPrompt(prompt);
+    setErrorMsg(null);
+    setState("analyzing");
+    try {
       const minDelay = new Promise((r) => setTimeout(r, 1200));
-
-      setState("analyzing");
       const [analysisResult] = await Promise.all([
-        analyzeFile(uploadResult.file_id),
+        analyzeFile(currentFile.file_id, prompt),
         minDelay,
       ]);
-
       setAnalysis(analysisResult);
       setState("ready");
     } catch (err) {
@@ -64,7 +74,7 @@ export default function Home() {
     setErrorMsg(null);
     setState("analyzing");
     try {
-      const result = await analyzeFile(currentFile.file_id);
+      const result = await analyzeFile(currentFile.file_id, lastPrompt);
       setAnalysis(result);
       setState("ready");
     } catch (err) {
@@ -163,6 +173,24 @@ export default function Home() {
               exit={{ opacity: 0 }}
             >
               <LoadingState phase={state === "uploading" ? "uploading" : "analyzing"} />
+            </motion.div>
+          )}
+
+          {/* Prompt input */}
+          {state === "prompting" && currentFile && (
+            <motion.div
+              key="prompting"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -16 }}
+              className="flex flex-col items-center py-8"
+            >
+              <PromptInput
+                filename={currentFile.filename}
+                rows={currentFile.rows}
+                columns={currentFile.columns.length}
+                onAnalyze={handleAnalyze}
+              />
             </motion.div>
           )}
 

@@ -23,11 +23,14 @@ export async function uploadFile(file: File) {
   return handleResponse<import("../types").UploadResponse>(res);
 }
 
-export async function analyzeFile(fileId: string) {
+export async function analyzeFile(fileId: string, userPrompt?: string) {
   const res = await fetch(`${API_URL}/api/analyze`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ file_id: fileId }),
+    body: JSON.stringify({
+      file_id: fileId,
+      ...(userPrompt?.trim() ? { user_prompt: userPrompt.trim() } : {}),
+    }),
   });
   return handleResponse<import("../types").AnalysisResponse>(res);
 }

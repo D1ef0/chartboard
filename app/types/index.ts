@@ -39,4 +39,4 @@ export interface DashboardChart {
   file_id: string;
 }
 
-export type AppState = "idle" | "uploading" | "analyzing" | "ready" | "error";
+export type AppState = "idle" | "uploading" | "prompting" | "analyzing" | "ready" | "error";
