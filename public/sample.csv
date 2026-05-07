@@ -39,3 +39,57 @@ fecha,region,categoria,producto,ventas,descuento,cantidad
 2024-06-02,Sur,Electrónica,SSD 1TB,38000,0.00,3
 2024-06-06,Este,Ropa,Bikini Summer,4900,0.20,28
 2024-06-10,Oeste,Hogar,Cortinas Blackout,12500,0.10,6
+2024-06-14,Centro,Electrónica,Webcam HD,9100,0.05,9
+2024-06-18,Norte,Alimentos,Aceite Oliva,3800,0.00,44
+2024-06-22,Sur,Ropa,Camisa Lino,6500,0.10,17
+2024-06-26,Este,Hogar,Espejo Redondo,8700,0.00,5
+2024-06-30,Oeste,Electrónica,Micrófono USB,11200,0.05,7
+2024-07-04,Centro,Alimentos,Vino Reserva,14500,0.15,20
+2024-07-08,Norte,Ropa,Parka Impermeable,18900,0.10,11
+2024-07-12,Sur,Hogar,Mesa Centro,22000,0.05,3
+2024-07-16,Este,Electrónica,Tablet Lite,24500,0.20,6
+2024-07-20,Oeste,Alimentos,Cerveza Artesanal,5600,0.00,32
+2024-07-24,Centro,Ropa,Jean Slim,7800,0.10,23
+2024-07-28,Norte,Hogar,Estante Flotante,4300,0.00,18
+2024-08-01,Sur,Electrónica,Proyector Mini,42000,0.05,2
+2024-08-05,Este,Alimentos,Miel Orgánica,2700,0.00,60
+2024-08-09,Oeste,Ropa,Polera UV,3400,0.15,40
+2024-08-13,Centro,Hogar,Silla Plástico,6100,0.10,12
+2024-08-17,Norte,Electrónica,Router WiFi 6,16800,0.00,5
+2024-08-21,Sur,Alimentos,Pasta Premium,1900,0.05,75
+2024-08-25,Este,Ropa,Sweater Lana,9200,0.20,14
+2024-08-29,Oeste,Hogar,Maceta Cerámica,3600,0.00,27
+2024-09-02,Centro,Electrónica,Disco Externo,21000,0.10,4
+2024-09-06,Norte,Alimentos,Quinoa Bolsa,4400,0.05,50
+2024-09-10,Sur,Ropa,Gorra Cap,2100,0.00,65
+2024-09-14,Este,Hogar,Reloj Pared,5300,0.10,10
+2024-09-18,Oeste,Electrónica,Auriculares Over,23500,0.05,6
+2024-09-22,Centro,Alimentos,Chocolate Premium,3100,0.00,48
+2024-09-26,Norte,Ropa,Blazer Formal,19500,0.15,7
+2024-09-30,Sur,Hogar,Cuadro Arte,8900,0.05,9
+2024-10-04,Este,Electrónica,Impresora Laser,58000,0.10,2
+2024-10-08,Oeste,Alimentos,Yerba Premium,2600,0.00,80
+2024-10-12,Centro,Ropa,Medias Pack,1400,0.20,90
+2024-10-16,Norte,Hogar,Aspiradora,34000,0.05,3
+2024-10-20,Sur,Electrónica,Teclado Inalámbrico,8700,0.10,11
+2024-10-24,Este,Alimentos,Frutos Secos Mix,5900,0.00,35
+2024-10-28,Oeste,Ropa,Piloto Lluvia,14200,0.10,8
+2024-11-01,Centro,Hogar,Sillón Individual,48000,0.15,2
+2024-11-05,Norte,Electrónica,Monitor Curvo,67000,0.05,1
+2024-11-09,Sur,Alimentos,Salsa Artesanal,2300,0.00,55
+2024-11-13,Este,Ropa,Calza Deportiva,4100,0.15,30
+2024-11-17,Oeste,Hogar,Humidificador,7600,0.10,8
+2024-11-21,Centro,Electrónica,Smartwatch Pro,28500,0.05,5
+2024-11-25,Norte,Alimentos,Whisky Single,22000,0.00,12
+2024-11-29,Sur,Ropa,Traje Baño,5700,0.20,22
+2024-12-03,Este,Hogar,Árbol Navidad,9400,0.10,15
+2024-12-07,Oeste,Electrónica,Consola Retro,31000,0.05,4
+2024-12-11,Centro,Alimentos,Caja Navideña,16500,0.15,28
+2024-12-15,Norte,Ropa,Bufanda Navidad,3200,0.00,45
+2024-12-19,Sur,Hogar,Guirnalda LED,4800,0.10,38
+2024-12-23,Este,Electrónica,Drone Mini,54000,0.20,2
+2024-12-27,Oeste,Alimentos,Champagne Box,18700,0.05,9
+2024-12-31,Centro,Ropa,Pijama Premium,6900,0.10,20
+2024-12-31,Norte,Hogar,Set Velas,2800,0.00,62
+2024-12-31,Sur,Electrónica,Laptop Ultrabook,89000,0.05,1
+2024-12-31,Este,Alimentos,Tabla Quesos,11300,0.15,16

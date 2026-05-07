@@ -48,7 +48,8 @@
     "accepts": "acepta: .csv · .xlsx  ·  máx 10MB",
     "browseButton": "explorar",
     "privacy": "tus datos permanecen en tu sesión · sin entrenamiento",
-    "errorType": "Solo se aceptan .csv y .xlsx de hasta 10 MB"
+    "errorType": "Solo se aceptan .csv y .xlsx de hasta 10 MB",
+    "sampleLabel": "descargar archivo de ejemplo"
   },
   "loading": {
     "uploadLabel": "SUBIENDO",

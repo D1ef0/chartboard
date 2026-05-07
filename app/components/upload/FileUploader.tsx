@@ -78,7 +78,7 @@ export function FileUploader({ onFile, disabled }: FileUploaderProps) {
             background: "var(--color-bg)",
           }}
         >
-          <pre className="hidden sm:block cb-mono text-[11px] leading-[1.3] p-1.5 rounded-md whitespace-pre"
+          <pre className="cb-mono text-[11px] leading-[1.3] p-1.5 rounded-md whitespace-pre self-center sm:self-auto"
                style={{
                  color: "var(--color-ink-3)",
                  border: "1px solid var(--color-line)",
@@ -111,7 +111,10 @@ export function FileUploader({ onFile, disabled }: FileUploaderProps) {
           </div>
         </div>
 
-        <div className="flex justify-end mt-3.5 cb-mono text-[11px]" style={{ color: "var(--color-ink-4)" }}>
+        <div className="flex justify-between items-center mt-3.5 cb-mono text-[11px]" style={{ color: "var(--color-ink-4)" }}>
+          <a href="/sample.csv" download onClick={(e) => e.stopPropagation()} className="hover:underline" style={{ color: "var(--color-ink-3)" }}>
+            ↓ {t("uploader.sampleLabel")}
+          </a>
           <span>{t("uploader.privacy")}</span>
         </div>
       </div>
