@@ -1,7 +1,5 @@
 import { useCallback, useState } from "react";
 import { useDropzone, type FileRejection } from "react-dropzone";
-import { Upload, FileSpreadsheet } from "lucide-react";
-import { cn } from "../../lib/utils";
 
 interface FileUploaderProps {
   onFile: (file: File) => void;
@@ -15,7 +13,7 @@ export function FileUploader({ onFile, disabled }: FileUploaderProps) {
     (accepted: File[], rejected: FileRejection[]) => {
       setError(null);
       if (rejected.length > 0) {
-        setError("Solo se aceptan archivos .csv y .xlsx de hasta 10 MB");
+        setError("Solo se aceptan .csv y .xlsx de hasta 10 MB");
         return;
       }
       if (accepted[0]) onFile(accepted[0]);
@@ -35,46 +33,96 @@ export function FileUploader({ onFile, disabled }: FileUploaderProps) {
   });
 
   return (
-    <div className="w-full max-w-xl mx-auto">
+    <div className="max-w-[920px] mx-auto px-5 pt-14 pb-10">
+      <div className="mb-7">
+        <div className="cb-mono text-[11px] tracking-wider" style={{ color: "var(--color-ink-4)" }}>
+          [01] · INPUT
+        </div>
+        <h1 className="text-[56px] leading-[1.05] font-semibold tracking-[-0.04em] mt-2 mb-1">
+          Drop a sheet.<br />
+          <span style={{ color: "var(--color-ink-3)" }}>
+            Get a dashboard in <span style={{ color: "var(--color-accent)" }}>one breath</span>.
+          </span>
+        </h1>
+        <p className="cb-mono text-[13px] mt-3.5 max-w-[540px]" style={{ color: "var(--color-ink-3)" }}>
+          point-it-at your <span style={{ color: "var(--color-ink-2)" }}>.csv</span> or{" "}
+          <span style={{ color: "var(--color-ink-2)" }}>.xlsx</span>. an analyst-grade model reads the columns,
+          proposes the most revealing views, you compose.
+        </p>
+      </div>
+
       <div
         {...getRootProps()}
-        className={cn(
-          "border-2 border-dashed rounded-2xl p-12 text-center cursor-pointer transition-all duration-200",
-          isDragActive
-            ? "border-blue-500 bg-blue-50 dark:bg-blue-950/30 scale-[1.02]"
-            : "border-gray-300 dark:border-gray-700 hover:border-blue-400 hover:bg-gray-50 dark:hover:bg-gray-900/50",
-          disabled && "opacity-50 cursor-not-allowed"
-        )}
+        className="rounded-[10px] p-7 cursor-pointer transition-all"
+        style={{
+          border: `1px ${isDragActive ? "solid" : "dashed"} ${isDragActive ? "var(--color-accent)" : "var(--color-line)"}`,
+          background: isDragActive ? "var(--color-accent-tint)" : "var(--color-bg-2)",
+          transform: isDragActive ? "translateY(-2px)" : "none",
+          opacity: disabled ? 0.5 : 1,
+        }}
       >
         <input {...getInputProps()} />
-        <div className="flex flex-col items-center gap-4">
-          <div
-            className={cn(
-              "p-4 rounded-full transition-colors",
-              isDragActive ? "bg-blue-100 dark:bg-blue-900/50" : "bg-gray-100 dark:bg-gray-800"
-            )}
-          >
-            {isDragActive ? (
-              <FileSpreadsheet className="w-10 h-10 text-blue-500" />
-            ) : (
-              <Upload className="w-10 h-10 text-gray-400" />
-            )}
-          </div>
+        <div className="cb-mono text-[12px] mb-3.5 flex items-center gap-2.5" style={{ color: "var(--color-ink-4)" }}>
+          <span style={{ color: "var(--color-accent)" }}>$</span>
+          <span>chartboard <span style={{ color: "var(--color-ink-2)" }}>upload</span> --auto-detect</span>
+          <span className="ml-auto" style={{ color: "var(--color-ink-4)" }}>
+            {isDragActive ? "release to upload ↓" : "drop · or click to browse"}
+          </span>
+        </div>
+
+        <div
+          className="grid items-center gap-4 px-6 py-8 rounded-lg min-h-[180px]"
+          style={{
+            gridTemplateColumns: "auto 1fr auto",
+            border: "1px solid var(--color-line-soft)",
+            background: "var(--color-bg)",
+          }}
+        >
+          <pre className="cb-mono text-[11px] leading-[1.3] p-1.5 rounded-md whitespace-pre"
+               style={{
+                 color: "var(--color-ink-3)",
+                 border: "1px solid var(--color-line)",
+                 background: "var(--color-bg-2)",
+               }}>
+{`┌─────────┐
+│ a │ b │ c│
+├───┼───┼──┤
+│ ░ │ ░ │ ░│
+│ ░ │ ░ │ ░│
+│ ░ │ ░ │ ░│
+└───┴───┴──┘`}
+          </pre>
           <div>
-            <p className="text-lg font-semibold text-gray-700 dark:text-gray-200">
-              {isDragActive ? "Suelta tu archivo aquí" : "Arrastra tu archivo aquí"}
-            </p>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              o haz clic para seleccionar
-            </p>
+            <div className="text-[18px] font-semibold tracking-tight">
+              {isDragActive ? "Release to begin parsing" : "Drag your file into this box"}
+            </div>
+            <div className="cb-mono text-[12px] mt-1.5" style={{ color: "var(--color-ink-3)" }}>
+              accepts: <span style={{ color: "var(--color-ink-2)" }}>.csv</span> ·{" "}
+              <span style={{ color: "var(--color-ink-2)" }}>.xlsx</span> &nbsp; · &nbsp; max{" "}
+              <span style={{ color: "var(--color-ink-2)" }}>10MB</span>
+            </div>
           </div>
-          <p className="text-xs text-gray-400 dark:text-gray-500">
-            CSV o XLSX • Máximo 10 MB
-          </p>
+          <div className="self-stretch flex flex-col gap-2 justify-center">
+            <button
+              type="button"
+              className="px-4 py-2 rounded-md cb-mono text-[12px] font-semibold inline-flex items-center gap-2"
+              style={{ background: "var(--color-ink)", color: "var(--color-bg)" }}
+            >
+              browse <span className="cb-kbd" style={{ background: "var(--color-bg-3)" }}>⏎</span>
+            </button>
+          </div>
+        </div>
+
+        <div className="flex justify-between mt-3.5 cb-mono text-[11px]" style={{ color: "var(--color-ink-4)" }}>
+          <span>tip · use <span className="cb-kbd">⌘V</span> to paste a tabular clipboard</span>
+          <span>data stays in your session · no training</span>
         </div>
       </div>
+
       {error && (
-        <p className="mt-3 text-sm text-red-500 text-center">{error}</p>
+        <p className="mt-3 text-sm text-center" style={{ color: "var(--color-danger)" }}>
+          {error}
+        </p>
       )}
     </div>
   );

@@ -1,66 +1,96 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+interface LoadingStateProps {
+  phase: "uploading" | "analyzing";
+  onCancel?: () => void;
+}
+
 const MESSAGES_UPLOAD = [
-  "Leyendo tu archivo...",
-  "Procesando datos...",
-  "Preparando análisis...",
+  "reading your file",
+  "detecting encoding",
+  "parsing rows",
+  "inferring column types",
+  "indexing data",
+  "building schema",
 ];
 
 const MESSAGES_ANALYZE = [
-  "Consultando al analista IA...",
-  "Detectando patrones...",
-  "Identificando insights...",
-  "Evaluando visualizaciones...",
-  "Casi listo...",
+  "sampling your dataset",
+  "profiling columns",
+  "reasoning about structure",
+  "finding candidate views",
+  "scoring relevance",
+  "selecting best charts",
+  "writing insights",
 ];
 
-interface LoadingStateProps {
-  phase: "uploading" | "analyzing";
-}
-
-export function LoadingState({ phase }: LoadingStateProps) {
+export function LoadingState({ phase, onCancel }: LoadingStateProps) {
   const messages = phase === "uploading" ? MESSAGES_UPLOAD : MESSAGES_ANALYZE;
-  const [index, setIndex] = useState(0);
+  const [msgIndex, setMsgIndex] = useState(0);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setIndex((i) => (i + 1) % messages.length);
-    }, 1800);
-    return () => clearInterval(interval);
-  }, [messages.length]);
+    setMsgIndex(0);
+    const id = setInterval(() => setMsgIndex((n) => (n + 1) % messages.length), 2200);
+    return () => clearInterval(id);
+  }, [phase, messages.length]);
+
+  useEffect(() => {
+    if (!onCancel) return;
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onCancel(); };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [onCancel]);
 
   return (
-    <div className="flex flex-col items-center justify-center gap-8 py-16">
-      <div className="relative w-16 h-16">
-        <div className="absolute inset-0 rounded-full border-4 border-gray-200 dark:border-gray-700" />
-        <div className="absolute inset-0 rounded-full border-4 border-blue-500 border-t-transparent animate-spin" />
+    <div className="max-w-[760px] mx-auto px-5 py-14">
+      <div className="cb-mono text-[11px] tracking-wider" style={{ color: "var(--color-ink-4)" }}>
+        {phase === "uploading" ? "UPLOADING" : "ANALYZING"}
+      </div>
+      <h2 className="text-[28px] font-semibold tracking-tight my-2 mb-4">
+        {phase === "uploading" ? "Reading your file" : "Reasoning over your data"}
+        <span className="cb-caret ml-1.5" />
+      </h2>
+
+      <div className="relative h-[8px] rounded-full mb-5 overflow-hidden"
+           style={{ background: "var(--color-bg-3)" }}>
+        <motion.div
+          className="absolute inset-y-0 rounded-full"
+          style={{ background: "var(--color-accent)", width: "38%" }}
+          animate={{ left: ["-38%", "100%"] }}
+          transition={{ duration: 1.7, ease: "easeInOut", repeat: Infinity, repeatDelay: 0.25 }}
+        />
       </div>
 
-      <div className="flex flex-col gap-3 w-full max-w-xs">
-        {[0, 1, 2].map((i) => (
+      <div
+        className="rounded-lg px-4 py-5 cb-mono text-[13px]"
+        style={{ border: "1px solid var(--color-line)", background: "var(--color-bg-2)", minHeight: "66px", display: "flex", alignItems: "center" }}
+      >
+        <AnimatePresence mode="wait">
           <motion.div
-            key={i}
-            className="h-3 rounded-full bg-gray-200 dark:bg-gray-700"
-            animate={{ opacity: [0.4, 1, 0.4] }}
-            transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.2 }}
-            style={{ width: `${100 - i * 15}%` }}
-          />
-        ))}
+            key={msgIndex}
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -5 }}
+            transition={{ duration: 0.22 }}
+            className="flex items-center gap-2"
+          >
+            <span style={{ color: "var(--color-accent)" }}>$</span>
+            <span style={{ color: "var(--color-ink-2)" }}>{messages[msgIndex]}</span>
+            <span className="cb-caret" />
+          </motion.div>
+        </AnimatePresence>
       </div>
 
-      <AnimatePresence mode="wait">
-        <motion.p
-          key={index}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.3 }}
-          className="text-gray-500 dark:text-gray-400 text-center font-medium"
+      {onCancel && (
+        <button
+          onClick={onCancel}
+          className="mt-3.5 cb-mono text-[11px]"
+          style={{ background: "none", border: "none", padding: 0, color: "var(--color-ink-4)" }}
         >
-          {messages[index]}
-        </motion.p>
-      </AnimatePresence>
+          press <span className="cb-kbd">esc</span> to cancel
+        </button>
+      )}
     </div>
   );
 }

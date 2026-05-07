@@ -1,48 +1,163 @@
-import { X, BarChart2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAppStore } from "../../lib/store";
 import { ChartRenderer } from "./ChartRenderer";
+import type { DashboardChart } from "../../types";
+
+const SLOTS: React.CSSProperties[] = [
+  { gridColumn: "span 4", gridRow: "span 2" }, // hero
+  { gridColumn: "span 2", gridRow: "span 1" },
+  { gridColumn: "span 2", gridRow: "span 1" },
+  { gridColumn: "span 3", gridRow: "span 1" },
+  { gridColumn: "span 3", gridRow: "span 1" },
+  { gridColumn: "span 2", gridRow: "span 1" },
+  { gridColumn: "span 4", gridRow: "span 1" },
+  { gridColumn: "span 3", gridRow: "span 1" },
+  { gridColumn: "span 3", gridRow: "span 1" },
+];
 
 export function DashboardGrid() {
-  const { dashboardCharts, removeFromDashboard } = useAppStore();
+  const { dashboardCharts, removeFromDashboard, currentFile } = useAppStore();
 
   if (dashboardCharts.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 gap-4 text-gray-400 dark:text-gray-600">
-        <BarChart2 className="w-12 h-12" />
-        <p className="text-center text-sm max-w-xs">
-          Agrega gráficos desde las sugerencias para construir tu dashboard
+      <div className="text-center py-16">
+        <div className="cb-mono text-[11px] tracking-wider" style={{ color: "var(--color-ink-4)" }}>
+          [04] · DASHBOARD
+        </div>
+        <h2 className="text-[28px] font-semibold my-2">Empty board</h2>
+        <p className="cb-mono text-[12px]" style={{ color: "var(--color-ink-3)" }}>
+          pin views from the suggestions panel to compose a dashboard.
         </p>
       </div>
     );
   }
 
+  const [hero, ...rest] = dashboardCharts;
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <AnimatePresence>
-        {dashboardCharts.map((chart) => (
-          <motion.div
-            key={chart.id}
-            initial={{ opacity: 0, scale: 0.96 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.96 }}
-            className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 shadow-sm"
-          >
-            <div className="flex items-start justify-between mb-4">
-              <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-sm leading-snug pr-4">
-                {chart.suggestion.title}
-              </h3>
-              <button
-                onClick={() => removeFromDashboard(chart.id)}
-                className="shrink-0 p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
+    <div>
+      {currentFile && (
+        <div className="grid gap-2.5 mb-4" style={{ gridTemplateColumns: "repeat(4, 1fr)" }}>
+          {[
+            { l: "rows analyzed", v: currentFile.rows.toLocaleString(), d: "+0" },
+            { l: "views pinned", v: dashboardCharts.length, d: `${Math.max(dashboardCharts.length - 1, 0)} secondary` },
+            { l: "columns", v: currentFile.columns.length, d: "schema ok" },
+            { l: "freshness", v: "live", d: "session active" },
+          ].map((k) => (
+            <div
+              key={k.l}
+              className="px-3.5 py-3 rounded-md"
+              style={{ border: "1px solid var(--color-line)", background: "var(--color-bg-2)" }}
+            >
+              <div className="cb-mono text-[10px] uppercase tracking-wider" style={{ color: "var(--color-ink-4)" }}>
+                {k.l}
+              </div>
+              <div className="text-[22px] font-semibold mt-1 tracking-tight">{k.v}</div>
+              <div className="cb-mono text-[11px]" style={{ color: "var(--color-ink-3)" }}>{k.d}</div>
             </div>
-            <ChartRenderer chart={chart} />
-          </motion.div>
-        ))}
-      </AnimatePresence>
+          ))}
+        </div>
+      )}
+
+      <div
+        className="grid gap-3.5"
+        style={{
+          gridTemplateColumns: "repeat(6, 1fr)",
+          gridAutoRows: "minmax(150px, auto)",
+        }}
+      >
+        <AnimatePresence>
+          <ChartCard key={hero.id} chart={hero} index={0} hero onRemove={() => removeFromDashboard(hero.id)} />
+          {rest.map((c, i) => (
+            <ChartCard key={c.id} chart={c} index={i + 1} onRemove={() => removeFromDashboard(c.id)} />
+          ))}
+        </AnimatePresence>
+      </div>
     </div>
+  );
+}
+
+function ChartCard({
+  chart, index, hero, onRemove,
+}: { chart: DashboardChart; index: number; hero?: boolean; onRemove: () => void }) {
+  const slot = hero ? SLOTS[0] : SLOTS[Math.min(index, SLOTS.length - 1)];
+  const s = chart.suggestion;
+
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, scale: 0.96 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.96 }}
+      style={{
+        ...slot,
+        border: "1px solid var(--color-line)",
+        borderRadius: 8,
+        background: "var(--color-bg-2)",
+        padding: hero ? "18px 18px 12px" : "14px 14px 8px",
+        position: "relative",
+        overflow: "hidden",
+      }}
+      className="flex flex-col"
+    >
+      <CornerTicks />
+      <div className="flex items-start justify-between gap-2.5 mb-2.5">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2 cb-mono text-[10px] mb-1" style={{ color: "var(--color-ink-4)" }}>
+            <span
+              className="px-1.5 py-[1px] rounded"
+              style={{
+                border: `1px solid ${hero ? "var(--color-accent)" : "var(--color-line)"}`,
+                color: hero ? "var(--color-accent)" : "var(--color-ink-3)",
+              }}
+            >
+              [{String(index + 1).padStart(2, "0")}]
+            </span>
+            <span className="uppercase">{s.chart_type}</span>
+            <span>·</span>
+            <span>{s.parameters.x_axis} → {s.parameters.y_axis ?? "—"}</span>
+            {hero && <span className="ml-1.5 tracking-wider" style={{ color: "var(--color-accent)" }}>HERO</span>}
+          </div>
+          <div className="font-semibold tracking-tight" style={{ fontSize: hero ? 22 : 15 }}>
+            {s.title}
+          </div>
+          {hero && (
+            <div className="cb-mono text-[12px] mt-1.5 max-w-[640px]" style={{ color: "var(--color-ink-3)" }}>
+              {s.insight}
+            </div>
+          )}
+        </div>
+        <button
+          onClick={onRemove}
+          className="w-6 h-6 grid place-items-center rounded cb-mono text-[12px]"
+          style={{ border: "1px solid var(--color-line-soft)", background: "var(--color-bg)", color: "var(--color-ink-3)" }}
+        >
+          ×
+        </button>
+      </div>
+      <div className="flex-1" style={{ minHeight: hero ? 320 : 150 }}>
+        <ChartRenderer chart={chart} />
+      </div>
+      {!hero && (
+        <div className="cb-mono text-[11px] mt-1 leading-[1.5]" style={{ color: "var(--color-ink-3)" }}>
+          {s.insight}
+        </div>
+      )}
+    </motion.div>
+  );
+}
+
+function CornerTicks() {
+  const tick: React.CSSProperties = {
+    position: "absolute", width: 8, height: 8,
+    borderColor: "var(--color-ink-4)", opacity: 0.5,
+  };
+  return (
+    <>
+      <span style={{ ...tick, top: 6, left: 6, borderTop: "1px solid", borderLeft: "1px solid" }} />
+      <span style={{ ...tick, top: 6, right: 6, borderTop: "1px solid", borderRight: "1px solid" }} />
+      <span style={{ ...tick, bottom: 6, left: 6, borderBottom: "1px solid", borderLeft: "1px solid" }} />
+      <span style={{ ...tick, bottom: 6, right: 6, borderBottom: "1px solid", borderRight: "1px solid" }} />
+    </>
   );
 }

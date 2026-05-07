@@ -13,17 +13,18 @@ async function handleResponse<T>(res: Response): Promise<T> {
   return res.json();
 }
 
-export async function uploadFile(file: File) {
+export async function uploadFile(file: File, signal?: AbortSignal) {
   const formData = new FormData();
   formData.append("file", file);
   const res = await fetch(`${API_URL}/api/upload`, {
     method: "POST",
     body: formData,
+    signal,
   });
   return handleResponse<import("../types").UploadResponse>(res);
 }
 
-export async function analyzeFile(fileId: string, userPrompt?: string) {
+export async function analyzeFile(fileId: string, userPrompt?: string, signal?: AbortSignal) {
   const res = await fetch(`${API_URL}/api/analyze`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -31,6 +32,7 @@ export async function analyzeFile(fileId: string, userPrompt?: string) {
       file_id: fileId,
       ...(userPrompt?.trim() ? { user_prompt: userPrompt.trim() } : {}),
     }),
+    signal,
   });
   return handleResponse<import("../types").AnalysisResponse>(res);
 }

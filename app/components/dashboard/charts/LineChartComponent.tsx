@@ -19,13 +19,13 @@ export function LineChartComponent({ data, xKey, yKeys }: LineChartComponentProp
   return (
     <ResponsiveContainer width="100%" height={260}>
       <LineChart data={data} margin={{ top: 4, right: 16, left: 0, bottom: 4 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+        <CartesianGrid strokeDasharray="3 3" stroke="var(--color-line)" />
         <XAxis
           dataKey={xKey}
-          tick={{ fontSize: 11 }}
+          tick={{ fontSize: 11, fill: "var(--color-ink-3)", fontFamily: "var(--font-mono)" }}
           tickFormatter={(v) => String(v).length > 10 ? String(v).slice(0, 10) + "…" : String(v)}
         />
-        <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => formatNumber(Number(v))} />
+        <YAxis tick={{ fontSize: 11, fill: "var(--color-ink-3)", fontFamily: "var(--font-mono)" }} tickFormatter={(v) => formatNumber(Number(v))} />
         <Tooltip formatter={(v) => formatNumber(Number(v))} />
         {yKeys.map((key, i) => (
           <Line

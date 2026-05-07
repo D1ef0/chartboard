@@ -20,21 +20,34 @@ export function ChartRenderer({ chart }: ChartRendererProps) {
 
   if (isLoading) {
     return (
-      <div className="h-64 flex items-center justify-center">
-        <div className="w-8 h-8 rounded-full border-4 border-gray-200 border-t-blue-500 animate-spin" />
+      <div className="h-full flex items-center justify-center">
+        <div className="flex gap-[2px]">
+          {Array.from({ length: 16 }).map((_, i) => (
+            <div
+              key={i}
+              className="w-[4px] rounded-[1px]"
+              style={{
+                height: 20,
+                background: "var(--color-line)",
+                animation: `cb-pulse 1.2s ease-in-out ${i * 0.05}s infinite`,
+              }}
+            />
+          ))}
+        </div>
       </div>
     );
   }
 
   if (isError || !data) {
     return (
-      <div className="h-64 flex flex-col items-center justify-center gap-3 text-gray-400">
-        <p className="text-sm">No se pudo cargar el gráfico</p>
+      <div className="h-full flex flex-col items-center justify-center gap-2">
+        <p className="cb-mono text-[11px]" style={{ color: "var(--color-danger)" }}>error loading chart</p>
         <button
           onClick={() => refetch()}
-          className="text-xs text-blue-500 hover:underline"
+          className="cb-mono text-[11px]"
+          style={{ color: "var(--color-accent)" }}
         >
-          Reintentar
+          retry ↺
         </button>
       </div>
     );

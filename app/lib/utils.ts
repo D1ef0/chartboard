@@ -11,12 +11,10 @@ export function formatNumber(n: number): string {
 }
 
 export const CHART_COLORS = [
-  "#3b82f6",
-  "#10b981",
-  "#f59e0b",
-  "#ef4444",
-  "#8b5cf6",
-  "#06b6d4",
-  "#ec4899",
-  "#84cc16",
+  "oklch(0.72 0.16 60)",
+  "oklch(0.55 0.18 25)",
+  "oklch(0.55 0.16 305)",
+  "oklch(0.55 0.14 220)",
+  "oklch(0.50 0.12 165)",
+  "oklch(0.42 0.05 270)",
 ];

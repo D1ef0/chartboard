@@ -20,9 +20,9 @@ export function ScatterChartComponent({ data, xKey, yKeys }: ScatterChartCompone
   return (
     <ResponsiveContainer width="100%" height={260}>
       <ScatterChart margin={{ top: 4, right: 16, left: 0, bottom: 4 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-        <XAxis dataKey={xKey} type="number" tick={{ fontSize: 11 }} tickFormatter={(v) => formatNumber(Number(v))} />
-        <YAxis dataKey={yKey} type="number" tick={{ fontSize: 11 }} tickFormatter={(v) => formatNumber(Number(v))} />
+        <CartesianGrid strokeDasharray="3 3" stroke="var(--color-line)" />
+        <XAxis dataKey={xKey} type="number" tick={{ fontSize: 11, fill: "var(--color-ink-3)", fontFamily: "var(--font-mono)" }} tickFormatter={(v) => formatNumber(Number(v))} />
+        <YAxis dataKey={yKey} type="number" tick={{ fontSize: 11, fill: "var(--color-ink-3)", fontFamily: "var(--font-mono)" }} tickFormatter={(v) => formatNumber(Number(v))} />
         <Tooltip cursor={{ strokeDasharray: "3 3" }} />
         <Scatter data={data} fill={CHART_COLORS[0]} opacity={0.7} />
       </ScatterChart>

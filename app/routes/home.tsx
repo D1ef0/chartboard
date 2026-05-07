@@ -1,26 +1,30 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { RotateCcw, Sparkles, Download, FileDown } from "lucide-react";
 import { FileUploader } from "../components/upload/FileUploader";
 import { LoadingState } from "../components/upload/LoadingState";
 import { PromptInput } from "../components/upload/PromptInput";
 import { SuggestionsGrid } from "../components/analysis/SuggestionsGrid";
 import { DashboardGrid } from "../components/dashboard/DashboardGrid";
+import { StatusBar } from "../components/shell/StatusBar";
 import { uploadFile, analyzeFile, downloadDataset } from "../lib/api";
 import { useAppStore } from "../lib/store";
 
 export function meta() {
   return [
-    { title: "Análisis al Instante — Dashboard con IA" },
-    { name: "description", content: "Convierte tu hoja de cálculo en insights con IA" },
+    { title: "chartboard — analista de datos con IA" },
+    { name: "description", content: "Convierte tu hoja de cálculo en un dashboard en un solo respiro." },
   ];
 }
+
+type View = "compose" | "dashboard";
 
 export default function Home() {
   const { state, analysis, currentFile, reset, setState, setFile, setAnalysis } = useAppStore();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [downloading, setDownloading] = useState<"csv" | "xlsx" | null>(null);
-  const [lastPrompt, setLastPrompt] = useState<string>("");
+  const [lastPrompt, setLastPrompt] = useState("");
+  const [view, setView] = useState<View>("compose");
+  const abortRef = useRef<AbortController | null>(null);
 
   const handleDownload = async (format: "csv" | "xlsx") => {
     if (!currentFile || downloading) return;
@@ -28,23 +32,30 @@ export default function Home() {
     try {
       await downloadDataset(currentFile.file_id, currentFile.filename, format);
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Error al descargar";
-      setErrorMsg(msg);
+      setErrorMsg(err instanceof Error ? err.message : "Error al descargar");
     } finally {
       setDownloading(null);
     }
   };
 
+  const handleCancel = () => {
+    abortRef.current?.abort();
+    abortRef.current = null;
+    reset();
+  };
+
   const handleFile = async (file: File) => {
     setErrorMsg(null);
     setState("uploading");
+    abortRef.current = new AbortController();
     try {
-      const uploadResult = await uploadFile(file);
-      setFile(uploadResult);
+      const res = await uploadFile(file, abortRef.current.signal);
+      abortRef.current = null;
+      setFile(res);
       setState("prompting");
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Error desconocido";
-      setErrorMsg(msg);
+      if ((err as Error).name === "AbortError") return;
+      setErrorMsg(err instanceof Error ? err.message : "Error desconocido");
       setState("error");
     }
   };
@@ -54,211 +65,148 @@ export default function Home() {
     setLastPrompt(prompt);
     setErrorMsg(null);
     setState("analyzing");
+    abortRef.current = new AbortController();
     try {
-      const minDelay = new Promise((r) => setTimeout(r, 1200));
-      const [analysisResult] = await Promise.all([
-        analyzeFile(currentFile.file_id, prompt),
-        minDelay,
-      ]);
-      setAnalysis(analysisResult);
+      const res = await analyzeFile(currentFile.file_id, prompt, abortRef.current.signal);
+      abortRef.current = null;
+      setAnalysis(res);
+      setView("compose");
       setState("ready");
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Error desconocido";
-      setErrorMsg(msg);
+      if ((err as Error).name === "AbortError") return;
+      setErrorMsg(err instanceof Error ? err.message : "Error desconocido");
       setState("error");
     }
   };
 
-  const handleRetryAnalysis = async () => {
+  const handleRetry = async () => {
     if (!currentFile) return;
     setErrorMsg(null);
     setState("analyzing");
+    abortRef.current = new AbortController();
     try {
-      const result = await analyzeFile(currentFile.file_id, lastPrompt);
-      setAnalysis(result);
+      const res = await analyzeFile(currentFile.file_id, lastPrompt, abortRef.current.signal);
+      abortRef.current = null;
+      setAnalysis(res);
       setState("ready");
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Error al analizar";
-      setErrorMsg(msg);
+      if ((err as Error).name === "AbortError") return;
+      setErrorMsg(err instanceof Error ? err.message : "Error al analizar");
       setState("error");
     }
   };
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-10 gap-4 flex-wrap">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-blue-600">
-              <Sparkles className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                Análisis al Instante
-              </h1>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Convierte tu hoja de cálculo en insights
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 flex-wrap">
-            {/* Download buttons — visible as soon as a file is uploaded */}
-            {currentFile && (
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-400 dark:text-gray-500 hidden sm:inline">
-                  Descargar:
-                </span>
-                {(["csv", "xlsx"] as const).map((fmt) => (
-                  <button
-                    key={fmt}
-                    onClick={() => handleDownload(fmt)}
-                    disabled={!!downloading}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-200 dark:border-gray-700 hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-white dark:bg-gray-900"
-                  >
-                    <Download className="w-3.5 h-3.5" />
-                    {downloading === fmt ? "..." : fmt.toUpperCase()}
-                  </button>
-                ))}
-              </div>
-            )}
-            {state !== "idle" && (
-              <button
-                onClick={reset}
-                className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
-              >
-                <RotateCcw className="w-4 h-4" />
-                Nuevo archivo
-              </button>
-            )}
-          </div>
-        </div>
+    <main className="min-h-screen" style={{ background: "var(--color-bg)" }}>
+      <StatusBar file={currentFile} state={state} onReset={reset} />
 
+      <div className="cb-grid-bg" style={{ minHeight: "calc(100vh - 50px)" }}>
         <AnimatePresence mode="wait">
-          {/* Idle: Upload */}
           {state === "idle" && (
-            <motion.div
-              key="idle"
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -16 }}
-              className="flex flex-col items-center gap-6 py-12"
-            >
-              <div className="text-center space-y-2">
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                  ¿Tienes datos sin analizar?
-                </h2>
-                <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto">
-                  Sube tu CSV o Excel y la IA te sugerirá las visualizaciones más reveladoras en segundos.
-                </p>
-              </div>
+            <motion.div key="idle" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }}>
               <FileUploader onFile={handleFile} />
-              <a
-                href="/sample.csv"
-                download="sample_ventas.csv"
-                className="flex items-center gap-2 text-sm text-gray-400 hover:text-blue-500 transition-colors"
-              >
-                <FileDown className="w-4 h-4" />
-                Descargar CSV de ejemplo
-              </a>
             </motion.div>
           )}
 
-          {/* Loading */}
           {(state === "uploading" || state === "analyzing") && (
-            <motion.div
-              key="loading"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              <LoadingState phase={state === "uploading" ? "uploading" : "analyzing"} />
+            <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <LoadingState phase={state === "uploading" ? "uploading" : "analyzing"} onCancel={handleCancel} />
             </motion.div>
           )}
 
-          {/* Prompt input */}
           {state === "prompting" && currentFile && (
-            <motion.div
-              key="prompting"
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -16 }}
-              className="flex flex-col items-center py-8"
-            >
+            <motion.div key="prompting" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }}>
               <PromptInput
                 filename={currentFile.filename}
                 rows={currentFile.rows}
                 columns={currentFile.columns.length}
+                columnNames={currentFile.columns}
+                columnTypes={currentFile.column_types}
                 onAnalyze={handleAnalyze}
+                onBack={reset}
               />
             </motion.div>
           )}
 
-          {/* Error */}
           {state === "error" && (
-            <motion.div
-              key="error"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex flex-col items-center gap-6 py-12"
-            >
-              <div className="text-center space-y-2">
-                <p className="text-red-500 font-medium">{errorMsg}</p>
+            <motion.div key="error" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                        className="max-w-[760px] mx-auto px-5 py-14">
+              <div className="cb-mono text-[11px] tracking-wider" style={{ color: "var(--color-danger)" }}>
+                [!!] · STDERR
               </div>
-              <div className="flex gap-3">
+              <h2 className="text-[28px] font-semibold tracking-tight my-2 mb-4">
+                Process exited with errors.
+              </h2>
+              <div
+                className="rounded-lg px-4 py-4 cb-mono text-[13px]"
+                style={{
+                  border: "1px solid var(--color-danger)",
+                  background: "var(--color-danger-tint)",
+                  color: "var(--color-ink)",
+                }}
+              >
+                <div className="mb-1.5" style={{ color: "var(--color-danger)" }}>error · 0x42</div>
+                <div style={{ color: "var(--color-ink-2)" }}>{errorMsg ?? "Error desconocido"}</div>
+              </div>
+              <div className="flex gap-2.5 mt-4">
                 <button
                   onClick={reset}
-                  className="px-4 py-2 rounded-lg border border-gray-300 text-sm hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
+                  className="cb-mono text-[12px] px-3.5 py-2 rounded-md"
+                  style={{ border: "1px solid var(--color-line)", background: "var(--color-bg-2)", color: "var(--color-ink-2)" }}
                 >
-                  Subir otro archivo
+                  new file
                 </button>
                 {currentFile && (
                   <button
-                    onClick={handleRetryAnalysis}
-                    className="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm hover:bg-blue-700 transition-colors"
+                    onClick={handleRetry}
+                    className="cb-mono text-[12px] font-semibold px-3.5 py-2 rounded-md"
+                    style={{ background: "var(--color-accent)", color: "oklch(0.18 0.05 60)" }}
                   >
-                    Reintentar análisis
+                    retry analysis
                   </button>
                 )}
               </div>
             </motion.div>
           )}
 
-          {/* Ready: Analysis + Dashboard */}
           {state === "ready" && analysis && (
-            <motion.div
-              key="ready"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="space-y-10"
-            >
-              {currentFile && (
-                <div className="flex items-center gap-2 text-sm text-gray-500">
-                  <span className="font-medium text-gray-700 dark:text-gray-300">
-                    {currentFile.filename}
-                  </span>
-                  <span>•</span>
-                  <span>{currentFile.rows.toLocaleString()} filas</span>
-                  <span>•</span>
-                  <span>{currentFile.columns.length} columnas</span>
+            <motion.div key="ready" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                        className="max-w-[1400px] mx-auto px-5 py-7">
+              <div className="flex items-center gap-2 mb-5 cb-mono text-[12px]">
+                {(["compose", "dashboard"] as const).map((v) => (
+                  <button
+                    key={v}
+                    onClick={() => setView(v)}
+                    className="px-3 py-1.5 rounded-md"
+                    style={{
+                      background: view === v ? "var(--color-ink)" : "transparent",
+                      color: view === v ? "var(--color-bg)" : "var(--color-ink-3)",
+                      border: `1px solid ${view === v ? "var(--color-ink)" : "var(--color-line-soft)"}`,
+                    }}
+                  >
+                    {v}
+                  </button>
+                ))}
+                <div className="ml-auto flex items-center gap-2">
+                  {(["csv", "xlsx"] as const).map((fmt) => (
+                    <button
+                      key={fmt}
+                      onClick={() => handleDownload(fmt)}
+                      disabled={!!downloading}
+                      className="cb-mono text-[11px] px-2.5 py-1.5 rounded-md disabled:opacity-50"
+                      style={{ border: "1px solid var(--color-line)", color: "var(--color-ink-2)", background: "var(--color-bg-2)" }}
+                    >
+                      ↓ {downloading === fmt ? "…" : fmt}
+                    </button>
+                  ))}
                 </div>
-              )}
+              </div>
 
-              <section>
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-                  Sugerencias de análisis
-                </h2>
-                <SuggestionsGrid analysis={analysis} />
-              </section>
-
-              <section>
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-                  Dashboard
-                </h2>
+              {view === "compose" ? (
+                <SuggestionsGrid analysis={analysis} onContinue={() => setView("dashboard")} />
+              ) : (
                 <DashboardGrid />
-              </section>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
