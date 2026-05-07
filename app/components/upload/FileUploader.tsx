@@ -113,8 +113,7 @@ export function FileUploader({ onFile, disabled }: FileUploaderProps) {
           </div>
         </div>
 
-        <div className="flex justify-between mt-3.5 cb-mono text-[11px]" style={{ color: "var(--color-ink-4)" }}>
-          <span>tip · use <span className="cb-kbd">⌘V</span> to paste a tabular clipboard</span>
+        <div className="flex justify-end mt-3.5 cb-mono text-[11px]" style={{ color: "var(--color-ink-4)" }}>
           <span>data stays in your session · no training</span>
         </div>
       </div>

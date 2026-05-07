@@ -47,14 +47,16 @@ export default function Home() {
   const handleFile = async (file: File) => {
     setErrorMsg(null);
     setState("uploading");
-    abortRef.current = new AbortController();
+    const ctrl = new AbortController();
+    abortRef.current = ctrl;
     try {
-      const res = await uploadFile(file, abortRef.current.signal);
+      const res = await uploadFile(file, ctrl.signal);
+      if (ctrl.signal.aborted) return;
       abortRef.current = null;
       setFile(res);
       setState("prompting");
     } catch (err) {
-      if ((err as Error).name === "AbortError") return;
+      if (ctrl.signal.aborted || (err as Error).name === "AbortError") return;
       setErrorMsg(err instanceof Error ? err.message : "Error desconocido");
       setState("error");
     }
@@ -65,15 +67,17 @@ export default function Home() {
     setLastPrompt(prompt);
     setErrorMsg(null);
     setState("analyzing");
-    abortRef.current = new AbortController();
+    const ctrl = new AbortController();
+    abortRef.current = ctrl;
     try {
-      const res = await analyzeFile(currentFile.file_id, prompt, abortRef.current.signal);
+      const res = await analyzeFile(currentFile.file_id, prompt, ctrl.signal);
+      if (ctrl.signal.aborted) return;
       abortRef.current = null;
       setAnalysis(res);
       setView("compose");
       setState("ready");
     } catch (err) {
-      if ((err as Error).name === "AbortError") return;
+      if (ctrl.signal.aborted || (err as Error).name === "AbortError") return;
       setErrorMsg(err instanceof Error ? err.message : "Error desconocido");
       setState("error");
     }
@@ -83,14 +87,16 @@ export default function Home() {
     if (!currentFile) return;
     setErrorMsg(null);
     setState("analyzing");
-    abortRef.current = new AbortController();
+    const ctrl = new AbortController();
+    abortRef.current = ctrl;
     try {
-      const res = await analyzeFile(currentFile.file_id, lastPrompt, abortRef.current.signal);
+      const res = await analyzeFile(currentFile.file_id, lastPrompt, ctrl.signal);
+      if (ctrl.signal.aborted) return;
       abortRef.current = null;
       setAnalysis(res);
       setState("ready");
     } catch (err) {
-      if ((err as Error).name === "AbortError") return;
+      if (ctrl.signal.aborted || (err as Error).name === "AbortError") return;
       setErrorMsg(err instanceof Error ? err.message : "Error al analizar");
       setState("error");
     }

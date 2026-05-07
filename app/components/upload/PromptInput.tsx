@@ -36,6 +36,16 @@ export function PromptInput({ filename, rows, columns, columnNames, columnTypes,
   const taRef = useRef<HTMLTextAreaElement>(null);
   useEffect(() => { taRef.current?.focus(); }, []);
 
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLInputElement) return;
+      const preset = PRESETS.find((p) => p.k === e.key.toUpperCase());
+      if (preset) setPrompt(preset.body);
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
+
   const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if ((e.metaKey || e.ctrlKey) && e.key === "Enter") onAnalyze(prompt);
   };
@@ -58,7 +68,7 @@ export function PromptInput({ filename, rows, columns, columnNames, columnTypes,
         <span style={{ color: "var(--color-ink-4)" }}>·</span>
         <span style={{ color: "var(--color-ink-2)" }}>{columns} cols</span>
         <span className="ml-auto inline-flex items-center gap-1.5" style={{ color: "var(--color-ok)" }}>
-          <span className="cb-dot ok" /> parsed
+          ✓ parsed
         </span>
       </div>
 

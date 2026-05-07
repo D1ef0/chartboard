@@ -75,8 +75,6 @@ export function StatusBar({ file, state, onReset }: StatusBarProps) {
           </button>
         )}
 
-        <span className="cb-kbd">⌘K</span>
-
         <button
           onClick={toggle}
           className="inline-flex items-center gap-1.5 px-2 py-1 rounded border"

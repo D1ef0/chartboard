@@ -59,11 +59,14 @@ export function SuggestionsGrid({ analysis, onContinue }: SuggestionsGridProps) 
         const s = filtered[cursor];
         if (isInDashboard(s.title)) return;
         addToDashboard(s, currentFile.file_id);
+      } else if ((e.metaKey || e.ctrlKey) && e.key === "d" && onContinue) {
+        e.preventDefault();
+        onContinue();
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [cursor, filtered, currentFile, addToDashboard, isInDashboard]);
+  }, [cursor, filtered, currentFile, addToDashboard, isInDashboard, onContinue]);
 
   return (
     <div className="grid gap-6" style={{ gridTemplateColumns: "1fr 360px" }}>
