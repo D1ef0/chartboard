@@ -1,6 +1,8 @@
 # Frontend — Análisis de datos con IA
 
-Interfaz web para análisis de datos asistido por IA. El usuario sube un archivo CSV o XLSX, un modelo de lenguaje analiza las columnas y devuelve sugerencias de visualización, y el usuario compone un dashboard interactivo con gráficos.
+Interfaz web para análisis de datos asistido por IA. El usuario sube un archivo CSV o XLSX, opcionalmente escribe una instrucción para el analista, un modelo de lenguaje analiza las columnas y devuelve sugerencias de visualización, y el usuario compone un dashboard interactivo con gráficos.
+
+Soporta español e inglés con selección por URL (`/es`, `/en`). Totalmente responsiva (mobile y desktop).
 
 ---
 
@@ -9,14 +11,14 @@ Interfaz web para análisis de datos asistido por IA. El usuario sube un archivo
 | Tecnología | Versión | Rol |
 |---|---|---|
 | React | 19.2.5 | UI |
-| React Router | 7.15.0 | Framework (SSR + routing) |
+| React Router | 7.15.0 | Framework (SPA mode + routing) |
 | TypeScript | 5.9.3 | Tipado estático |
 | TailwindCSS | 4.2.2 | Estilos |
+| i18next + react-i18next | — | Internacionalización (ES / EN) |
 | Zustand | 5.0.13 | Estado global del cliente |
 | TanStack React Query | 5.100.9 | Caché de datos de gráficos |
 | Recharts | 3.8.1 | Renderizado de gráficos |
 | Framer Motion | 12.38.0 | Animaciones |
-| Lucide React | 1.14.0 | Iconografía |
 | React Dropzone | 15.0.0 | Zona de arrastre para archivos |
 | Vite | 8.0.3 | Bundler (vía plugin de React Router) |
 
@@ -29,15 +31,25 @@ front/
 ├── app/
 │   ├── root.tsx                    # Layout raíz, provider de React Query
 │   ├── routes.ts                   # Declaración de rutas
-│   ├── app.css                     # Estilos globales (Tailwind)
+│   ├── app.css                     # Estilos globales (Tailwind + tokens CSS)
+│   ├── i18n/
+│   │   ├── index.ts                # Init i18next sincrónico (lee lang desde URL)
+│   │   └── locales/
+│   │       ├── es.json             # Traducciones español
+│   │       └── en.json             # Traducciones inglés
 │   ├── routes/
-│   │   └── home.tsx                # Ruta principal: flujo completo de la app
+│   │   ├── index.tsx               # / → redirect a /es
+│   │   ├── lang-layout.tsx         # /:lang — valida idioma, sincroniza i18n
+│   │   └── home.tsx                # /:lang/ — flujo completo de la app
 │   ├── components/
+│   │   ├── shell/
+│   │   │   └── StatusBar.tsx       # Barra de estado + switcher ES/EN
 │   │   ├── upload/
 │   │   │   ├── FileUploader.tsx    # Zona drag-and-drop (CSV / XLSX, máx. 10 MB)
-│   │   │   └── LoadingState.tsx    # Indicador de progreso
+│   │   │   ├── LoadingState.tsx    # Indicador de progreso animado
+│   │   │   └── PromptInput.tsx     # Instrucción opcional al analista + presets
 │   │   ├── analysis/
-│   │   │   ├── SuggestionsGrid.tsx # Grid de tarjetas de sugerencias
+│   │   │   ├── SuggestionsGrid.tsx # Grid de tarjetas de sugerencias + side rail
 │   │   │   └── SuggestionCard.tsx  # Tarjeta individual de sugerencia
 │   │   └── dashboard/
 │   │       ├── DashboardGrid.tsx   # Grid de gráficos activos
@@ -54,6 +66,7 @@ front/
 │   └── types/
 │       └── index.ts                # Interfaces TypeScript compartidas
 ├── public/
+│   └── sample.csv                  # Dataset de ejemplo (100 filas, ventas 2024)
 ├── .env.example
 ├── Dockerfile
 ├── vite.config.ts
@@ -100,6 +113,8 @@ npm run dev
 
 La app queda disponible en `http://localhost:5173`.
 
+Por defecto redirige a `/es`. Para probar en inglés: `http://localhost:5173/en`.
+
 ### Otros comandos
 
 ```bash
@@ -144,8 +159,20 @@ docker run -p 4000:4000 -e PORT=4000 app-front
 ## Flujo de la aplicación
 
 ```
-1. FileUploader     →  POST /api/upload     →  guarda file_id en Zustand
-2. SuggestionsGrid  →  POST /api/analyze    →  muestra tarjetas de sugerencias
-3. SuggestionCard   →  POST /api/chart-data →  agrega datos y renderiza gráfico
-4. DashboardGrid    →  compone el dashboard con los gráficos activos
+1. FileUploader   →  POST /api/upload    →  guarda file_id en Zustand
+2. PromptInput    →  instrucción opcional del usuario (o skip)
+3. SuggestionsGrid →  POST /api/analyze  →  muestra tarjetas de sugerencias
+4. SuggestionCard →  POST /api/chart-data →  agrega datos y renderiza gráfico
+5. DashboardGrid  →  compone el dashboard con los gráficos fijados
 ```
+
+## Internacionalización
+
+El idioma se selecciona a nivel de URL. La raíz `/` redirige automáticamente a `/es`.
+
+| URL | Idioma |
+|---|---|
+| `/es` | Español |
+| `/en` | Inglés |
+
+El switcher ES / EN en la barra de estado navega entre idiomas sin recargar la página ni perder el estado de la sesión.
