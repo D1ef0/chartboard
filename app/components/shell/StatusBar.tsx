@@ -1,3 +1,5 @@
+import { useNavigate, useParams } from "react-router";
+import { useTranslation } from "react-i18next";
 import { useTheme } from "../../lib/theme";
 import type { UploadResponse, AppState } from "../../types";
 
@@ -7,17 +9,11 @@ interface StatusBarProps {
   onReset: () => void;
 }
 
-const STATE_LABEL: Record<AppState, string> = {
-  idle: "IDLE",
-  uploading: "UPLOADING",
-  prompting: "PROMPTING",
-  analyzing: "ANALYZING",
-  ready: "READY",
-  error: "ERROR",
-};
-
 export function StatusBar({ file, state, onReset }: StatusBarProps) {
   const { theme, toggle } = useTheme();
+  const { t } = useTranslation();
+  const { lang } = useParams<{ lang: string }>();
+  const navigate = useNavigate();
 
   return (
     <div
@@ -47,22 +43,22 @@ export function StatusBar({ file, state, onReset }: StatusBarProps) {
           <span style={{ color: "var(--color-ink-4)" }}>~/</span>
           {file ? (
             <>
-              <span className="hidden sm:inline" style={{ color: "var(--color-ink-2)" }}>workspace</span>
+              <span className="hidden sm:inline" style={{ color: "var(--color-ink-2)" }}>{t("statusBar.breadcrumb.workspace")}</span>
               <span className="hidden sm:inline" style={{ color: "var(--color-ink-4)" }}>/</span>
               <span className="truncate max-w-[110px] sm:max-w-none" style={{ color: "var(--color-ink)" }}>{file.filename}</span>
-              <span className="ml-2 hidden sm:inline" style={{ color: "var(--color-ink-4)" }}>{file.rows.toLocaleString()} rows</span>
+              <span className="ml-2 hidden sm:inline" style={{ color: "var(--color-ink-4)" }}>{t("statusBar.breadcrumb.rows", { count: file.rows.toLocaleString() })}</span>
               <span className="hidden sm:inline" style={{ color: "var(--color-ink-4)" }}>·</span>
-              <span className="hidden sm:inline" style={{ color: "var(--color-ink-4)" }}>{file.columns.length} cols</span>
+              <span className="hidden sm:inline" style={{ color: "var(--color-ink-4)" }}>{t("statusBar.breadcrumb.cols", { count: file.columns.length })}</span>
             </>
           ) : (
-            <span style={{ color: "var(--color-ink-3)" }}>workspace/<span className="cb-caret" /></span>
+            <span style={{ color: "var(--color-ink-3)" }}>{t("statusBar.breadcrumb.workspace")}/<span className="cb-caret" /></span>
           )}
         </div>
 
         {/* state pill */}
         <span className="inline-flex items-center gap-1.5">
           <span className={`cb-dot ${state === "ready" ? "ok" : state === "error" ? "danger" : ""}`} />
-          {STATE_LABEL[state]}
+          {t(`statusBar.states.${state}`)}
         </span>
 
         {state !== "idle" && (
@@ -71,10 +67,28 @@ export function StatusBar({ file, state, onReset }: StatusBarProps) {
             className="px-2 py-1 rounded border"
             style={{ borderColor: "var(--color-line)", color: "var(--color-ink-2)" }}
           >
-            esc · reset
+            {t("statusBar.reset")}
           </button>
         )}
 
+        {/* lang switcher */}
+        <div className="inline-flex rounded border overflow-hidden" style={{ borderColor: "var(--color-line)" }}>
+          {(["es", "en"] as const).map((l) => (
+            <button
+              key={l}
+              onClick={() => navigate(`/${l}`)}
+              className="cb-mono text-[11px] px-2.5 py-1"
+              style={{
+                background: lang === l ? "var(--color-ink)" : "var(--color-bg-2)",
+                color: lang === l ? "var(--color-bg)" : "var(--color-ink-3)",
+              }}
+            >
+              {l.toUpperCase()}
+            </button>
+          ))}
+        </div>
+
+        {/* theme toggle */}
         <button
           onClick={toggle}
           className="inline-flex items-center gap-1.5 px-2 py-1 rounded border"

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQueries } from "@tanstack/react-query";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { useAppStore } from "../../lib/store";
 import { getChartData } from "../../lib/api";
 import { MiniChart } from "./MiniChart";
@@ -13,6 +14,7 @@ interface SuggestionsGridProps {
 
 export function SuggestionsGrid({ analysis, onContinue }: SuggestionsGridProps) {
   const { addToDashboard, removeFromDashboard, isInDashboard, currentFile, dashboardCharts } = useAppStore();
+  const { t } = useTranslation();
   const [query, setQuery] = useState("");
   const [cursor, setCursor] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -72,11 +74,11 @@ export function SuggestionsGrid({ analysis, onContinue }: SuggestionsGridProps) 
     <div className="grid gap-6 grid-cols-1 sm:grid-cols-[1fr_360px]">
       <div>
         <div className="cb-mono text-[11px] tracking-wider" style={{ color: "var(--color-ink-4)" }}>
-          [03] · COMPOSE
+          {t("suggestions.section")}
         </div>
         <div className="flex items-baseline justify-between mt-1.5 mb-4">
           <h2 className="text-[24px] sm:text-[32px] font-semibold tracking-tight m-0">
-            {analysis.suggestions.length} views proposed.
+            {t("suggestions.heading", { count: analysis.suggestions.length })}
           </h2>
           {onContinue && (
             <button
@@ -84,7 +86,7 @@ export function SuggestionsGrid({ analysis, onContinue }: SuggestionsGridProps) 
               className="cb-mono text-[12px] px-3.5 py-2 rounded-md inline-flex items-center gap-2"
               style={{ border: "1px solid var(--color-line)", background: "var(--color-bg-2)", color: "var(--color-ink-2)" }}
             >
-              open dashboard <span className="cb-kbd">⌘D</span>
+              {t("suggestions.openDashboard")} <span className="cb-kbd">⌘D</span>
             </button>
           )}
         </div>
@@ -102,7 +104,7 @@ export function SuggestionsGrid({ analysis, onContinue }: SuggestionsGridProps) 
               className="cb-mono text-[10px] self-start px-1.5 py-1 rounded"
               style={{ border: "1px solid var(--color-line)", color: "var(--color-ink-3)" }}
             >
-              ANALYST
+              {t("suggestions.analystLabel")}
             </div>
             <div className="cb-mono text-[12.5px] leading-[1.7]" style={{ color: "var(--color-ink-2)" }}>
               {analysis.overall_summary}
@@ -119,12 +121,12 @@ export function SuggestionsGrid({ analysis, onContinue }: SuggestionsGridProps) 
             ref={inputRef}
             value={query}
             onChange={(e) => { setQuery(e.target.value); setCursor(0); }}
-            placeholder="filter views… (try 'tend', 'bar', 'región')"
+            placeholder={t("suggestions.filterPlaceholder")}
             className="flex-1 bg-transparent border-0 outline-0 cb-mono text-[13px]"
             style={{ color: "var(--color-ink)" }}
           />
           <span className="cb-mono text-[11px]" style={{ color: "var(--color-ink-4)" }}>
-            ↑↓ <span className="cb-kbd">⏎</span> add
+            {t("suggestions.filterHint").split("⏎")[0]}<span className="cb-kbd">⏎</span>{t("suggestions.filterHint").split("⏎")[1]}
           </span>
         </div>
 
@@ -179,7 +181,7 @@ export function SuggestionsGrid({ analysis, onContinue }: SuggestionsGridProps) 
                 </div>
 
                 <div className="hidden sm:block cb-mono text-[11px]">
-                  <div className="mb-1" style={{ color: "var(--color-ink-4)" }}>conf [—]</div>
+                  <div className="mb-1" style={{ color: "var(--color-ink-4)" }}>{t("suggestions.confLabel")}</div>
                   <div className="flex gap-[1.5px]">
                     {Array.from({ length: 10 }).map((_, k) => (
                       <div
@@ -200,7 +202,7 @@ export function SuggestionsGrid({ analysis, onContinue }: SuggestionsGridProps) 
                       className="cb-mono text-[11px] px-2.5 py-[5px] rounded inline-flex items-center gap-1.5"
                       style={{ border: "1px solid var(--color-line)", background: "var(--color-bg-2)", color: "var(--color-ok)" }}
                     >
-                      ✓ pinned
+                      {t("suggestions.pinned")}
                     </button>
                   ) : (
                     <button
@@ -208,7 +210,7 @@ export function SuggestionsGrid({ analysis, onContinue }: SuggestionsGridProps) 
                       className="cb-mono text-[11px] px-2.5 py-[5px] rounded"
                       style={{ background: "var(--color-ink)", color: "var(--color-bg)" }}
                     >
-                      + pin
+                      {t("suggestions.pin")}
                     </button>
                   )}
                 </div>
@@ -217,7 +219,7 @@ export function SuggestionsGrid({ analysis, onContinue }: SuggestionsGridProps) 
           })}
           {filtered.length === 0 && (
             <div className="p-10 text-center cb-mono text-[12px]" style={{ color: "var(--color-ink-4)" }}>
-              no views match "{query}"
+              {t("suggestions.emptyState", { query })}
             </div>
           )}
         </div>
@@ -226,7 +228,7 @@ export function SuggestionsGrid({ analysis, onContinue }: SuggestionsGridProps) 
       {/* side rail */}
       <aside className="sm:sticky sm:top-20 sm:h-fit">
         <div className="cb-mono text-[11px] tracking-wider mb-2" style={{ color: "var(--color-ink-4)" }}>
-          PINNED · {dashboardCharts.length}
+          {t("suggestions.sideRail.heading", { count: dashboardCharts.length })}
         </div>
         <div
           className="rounded-lg p-3 min-h-[220px]"
@@ -234,8 +236,8 @@ export function SuggestionsGrid({ analysis, onContinue }: SuggestionsGridProps) 
         >
           {dashboardCharts.length === 0 ? (
             <div className="cb-mono text-[12px] leading-[1.7] px-1 py-2" style={{ color: "var(--color-ink-4)" }}>
-              press <span className="cb-kbd">⏎</span> on any view to pin it.<br />
-              first pin becomes the <span style={{ color: "var(--color-accent)" }}>HERO</span>.
+              {t("suggestions.sideRail.emptyHint1")} <span className="cb-kbd">{t("suggestions.sideRail.emptyHintKey")}</span> {t("suggestions.sideRail.emptyHint2")}<br />
+              {t("suggestions.sideRail.emptyHint3")} <span style={{ color: "var(--color-accent)" }}>{t("suggestions.sideRail.emptyHintHero")}</span>.
             </div>
           ) : (
             <div className="flex flex-col gap-2">
@@ -267,7 +269,7 @@ export function SuggestionsGrid({ analysis, onContinue }: SuggestionsGridProps) 
                   className="mt-1.5 px-3 py-2.5 rounded-md cb-mono text-[12px] font-semibold"
                   style={{ background: "var(--color-accent)", color: "oklch(0.18 0.05 60)" }}
                 >
-                  build dashboard →
+                  {t("suggestions.sideRail.buildButton")}
                 </button>
               )}
             </div>

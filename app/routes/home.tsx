@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { FileUploader } from "../components/upload/FileUploader";
 import { LoadingState } from "../components/upload/LoadingState";
 import { PromptInput } from "../components/upload/PromptInput";
@@ -8,11 +9,12 @@ import { DashboardGrid } from "../components/dashboard/DashboardGrid";
 import { StatusBar } from "../components/shell/StatusBar";
 import { uploadFile, analyzeFile, downloadDataset } from "../lib/api";
 import { useAppStore } from "../lib/store";
+import i18n from "../i18n";
 
 export function meta() {
   return [
-    { title: "chartboard — analista de datos con IA" },
-    { name: "description", content: "Convierte tu hoja de cálculo en un dashboard en un solo respiro." },
+    { title: i18n.t("meta.title") },
+    { name: "description", content: i18n.t("meta.description") },
   ];
 }
 
@@ -20,6 +22,7 @@ type View = "compose" | "dashboard";
 
 export default function Home() {
   const { state, analysis, currentFile, reset, setState, setFile, setAnalysis } = useAppStore();
+  const { t } = useTranslation();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [downloading, setDownloading] = useState<"csv" | "xlsx" | null>(null);
   const [lastPrompt, setLastPrompt] = useState("");
@@ -32,7 +35,7 @@ export default function Home() {
     try {
       await downloadDataset(currentFile.file_id, currentFile.filename, format);
     } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : "Error al descargar");
+      setErrorMsg(err instanceof Error ? err.message : t("error.download"));
     } finally {
       setDownloading(null);
     }
@@ -57,7 +60,7 @@ export default function Home() {
       setState("prompting");
     } catch (err) {
       if (ctrl.signal.aborted || (err as Error).name === "AbortError") return;
-      setErrorMsg(err instanceof Error ? err.message : "Error desconocido");
+      setErrorMsg(err instanceof Error ? err.message : t("error.unknown"));
       setState("error");
     }
   };
@@ -78,7 +81,7 @@ export default function Home() {
       setState("ready");
     } catch (err) {
       if (ctrl.signal.aborted || (err as Error).name === "AbortError") return;
-      setErrorMsg(err instanceof Error ? err.message : "Error desconocido");
+      setErrorMsg(err instanceof Error ? err.message : t("error.unknown"));
       setState("error");
     }
   };
@@ -97,7 +100,7 @@ export default function Home() {
       setState("ready");
     } catch (err) {
       if (ctrl.signal.aborted || (err as Error).name === "AbortError") return;
-      setErrorMsg(err instanceof Error ? err.message : "Error al analizar");
+      setErrorMsg(err instanceof Error ? err.message : t("error.analyze"));
       setState("error");
     }
   };
@@ -141,7 +144,7 @@ export default function Home() {
                 [!!] · STDERR
               </div>
               <h2 className="text-[28px] font-semibold tracking-tight my-2 mb-4">
-                Process exited with errors.
+                {t("error.heading")}
               </h2>
               <div
                 className="rounded-lg px-4 py-4 cb-mono text-[13px]"
@@ -152,7 +155,7 @@ export default function Home() {
                 }}
               >
                 <div className="mb-1.5" style={{ color: "var(--color-danger)" }}>error · 0x42</div>
-                <div style={{ color: "var(--color-ink-2)" }}>{errorMsg ?? "Error desconocido"}</div>
+                <div style={{ color: "var(--color-ink-2)" }}>{errorMsg ?? t("error.unknown")}</div>
               </div>
               <div className="flex gap-2.5 mt-4">
                 <button
@@ -160,7 +163,7 @@ export default function Home() {
                   className="cb-mono text-[12px] px-3.5 py-2 rounded-md"
                   style={{ border: "1px solid var(--color-line)", background: "var(--color-bg-2)", color: "var(--color-ink-2)" }}
                 >
-                  new file
+                  {t("error.newFile")}
                 </button>
                 {currentFile && (
                   <button
@@ -168,7 +171,7 @@ export default function Home() {
                     className="cb-mono text-[12px] font-semibold px-3.5 py-2 rounded-md"
                     style={{ background: "var(--color-accent)", color: "oklch(0.18 0.05 60)" }}
                   >
-                    retry analysis
+                    {t("error.retry")}
                   </button>
                 )}
               </div>
@@ -190,7 +193,7 @@ export default function Home() {
                       border: `1px solid ${view === v ? "var(--color-ink)" : "var(--color-line-soft)"}`,
                     }}
                   >
-                    {v}
+                    {t(`views.${v}`)}
                   </button>
                 ))}
                 <div className="ml-auto flex items-center gap-2">

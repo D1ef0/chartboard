@@ -1,0 +1,142 @@
+{
+  "meta": {
+    "title": "chartboard — AI-powered data analyst",
+    "description": "Turn your spreadsheet into a dashboard in one breath."
+  },
+  "error": {
+    "heading": "Process exited with errors.",
+    "unknown": "Unknown error",
+    "newFile": "new file",
+    "retry": "retry analysis",
+    "download": "Download error",
+    "analyze": "Analysis error",
+    "notFound": "Page not found.",
+    "generic": "Something went wrong."
+  },
+  "views": {
+    "compose": "compose",
+    "dashboard": "dashboard"
+  },
+  "statusBar": {
+    "states": {
+      "idle": "IDLE",
+      "uploading": "UPLOADING",
+      "prompting": "PROMPTING",
+      "analyzing": "ANALYZING",
+      "ready": "READY",
+      "error": "ERROR"
+    },
+    "breadcrumb": {
+      "workspace": "workspace",
+      "rows": "{{count}} rows",
+      "cols": "{{count}} cols"
+    },
+    "reset": "esc · reset"
+  },
+  "uploader": {
+    "section": "[01] · INPUT",
+    "headline": "Drop a sheet.",
+    "subHeadlinePrefix": "Get a dashboard in",
+    "subHeadlineAccent": "one breath",
+    "subHeadlineSuffix": ".",
+    "description": "point-it-at your .csv or .xlsx. an analyst-grade model reads the columns, proposes the most revealing views, you compose.",
+    "command": "chartboard upload --auto-detect",
+    "releaseLabel": "release to upload ↓",
+    "dropLabel": "drop · or click to browse",
+    "dragActive": "Release to begin parsing",
+    "dragIdle": "Drag your file into this box",
+    "accepts": "accepts: .csv · .xlsx  ·  max 10MB",
+    "browseButton": "browse",
+    "privacy": "data stays in your session · no training",
+    "errorType": "Only .csv and .xlsx files up to 10 MB are accepted."
+  },
+  "loading": {
+    "uploadLabel": "UPLOADING",
+    "analyzeLabel": "ANALYZING",
+    "uploadHeading": "Reading your file",
+    "analyzeHeading": "Reasoning over your data",
+    "cancelHint": "press",
+    "cancelKey": "esc",
+    "cancelSuffix": "to cancel",
+    "messagesUpload": [
+      "reading your file",
+      "detecting encoding",
+      "parsing rows",
+      "inferring column types",
+      "indexing data",
+      "building schema"
+    ],
+    "messagesAnalyze": [
+      "sampling your dataset",
+      "profiling columns",
+      "reasoning about structure",
+      "finding candidate views",
+      "scoring relevance",
+      "selecting best charts",
+      "writing insights"
+    ]
+  },
+  "prompt": {
+    "section": "[02] · INSTRUCT",
+    "heading": "What should the analyst look for?",
+    "schemaLabel": "SCHEMA · {{count}} columns",
+    "previewLabel": "preview · 5 rows",
+    "parsed": "✓ parsed",
+    "back": "← back",
+    "fileLabel": "file:",
+    "rowsLabel": "{{count}} rows",
+    "colsLabel": "{{count}} cols",
+    "promptFile": "prompt.txt",
+    "charCount": "{{current}}/500",
+    "placeholder": "e.g.: I want to see sales trends by region and detect months with unexpected drops.",
+    "runButton": "run analysis",
+    "skipButton": "skip · auto-analyze",
+    "analystHint": "analyst: haiku-4.5 · est. 6–9s",
+    "presets": [
+      { "k": "T", "label": "time trends", "body": "Identify temporal trends and seasonality. Mark inflection points." },
+      { "k": "R", "label": "ranking by category", "body": "Top and bottom performers by category. Concentration of top 5." },
+      { "k": "C", "label": "correlations", "body": "Correlations between numeric variables. Report r and p-value where applicable." },
+      { "k": "A", "label": "anomalies / outliers", "body": "Detect outliers (> 3σ) and inconsistent records." },
+      { "k": "S", "label": "segment comparison", "body": "Comparison between segments: means, medians, variance." },
+      { "k": "D", "label": "overall distribution", "body": "Histogram and distribution summary for each numeric variable." }
+    ]
+  },
+  "suggestions": {
+    "section": "[03] · COMPOSE",
+    "heading_one": "{{count}} view proposed.",
+    "heading_other": "{{count}} views proposed.",
+    "openDashboard": "open dashboard",
+    "filterPlaceholder": "filter views… (try 'trend', 'bar', 'region')",
+    "filterHint": "↑↓ ⏎ add",
+    "analystLabel": "ANALYST",
+    "confLabel": "conf [—]",
+    "pinned": "✓ pinned",
+    "pin": "+ pin",
+    "emptyState": "no views match \"{{query}}\"",
+    "sideRail": {
+      "heading": "PINNED · {{count}}",
+      "emptyHint1": "press",
+      "emptyHintKey": "⏎",
+      "emptyHint2": "on any view to pin it.",
+      "emptyHint3": "first pin becomes the",
+      "emptyHintHero": "HERO",
+      "buildButton": "build dashboard →"
+    }
+  },
+  "dashboard": {
+    "section": "[04] · DASHBOARD",
+    "emptyHeading": "Empty board",
+    "emptyBody": "pin views from the suggestions panel to compose a dashboard.",
+    "stats": {
+      "rowsAnalyzed": "rows analyzed",
+      "viewsPinned": "views pinned",
+      "secondary": "{{count}} secondary",
+      "columns": "columns",
+      "schemaOk": "schema ok",
+      "freshness": "freshness",
+      "live": "live",
+      "sessionActive": "session active",
+      "rowsDelta": "+0"
+    }
+  }
+}

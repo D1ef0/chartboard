@@ -1,4 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { useAppStore } from "../../lib/store";
 import { ChartRenderer } from "./ChartRenderer";
 import type { DashboardChart } from "../../types";
@@ -17,16 +18,17 @@ const SLOT_CLASSES = [
 
 export function DashboardGrid() {
   const { dashboardCharts, removeFromDashboard, currentFile } = useAppStore();
+  const { t } = useTranslation();
 
   if (dashboardCharts.length === 0) {
     return (
       <div className="text-center py-16">
         <div className="cb-mono text-[11px] tracking-wider" style={{ color: "var(--color-ink-4)" }}>
-          [04] · DASHBOARD
+          {t("dashboard.section")}
         </div>
-        <h2 className="text-[28px] font-semibold my-2">Empty board</h2>
+        <h2 className="text-[28px] font-semibold my-2">{t("dashboard.emptyHeading")}</h2>
         <p className="cb-mono text-[12px]" style={{ color: "var(--color-ink-3)" }}>
-          pin views from the suggestions panel to compose a dashboard.
+          {t("dashboard.emptyBody")}
         </p>
       </div>
     );
@@ -39,10 +41,10 @@ export function DashboardGrid() {
       {currentFile && (
         <div className="grid gap-2.5 mb-4 grid-cols-2 sm:grid-cols-4">
           {[
-            { l: "rows analyzed", v: currentFile.rows.toLocaleString(), d: "+0" },
-            { l: "views pinned", v: dashboardCharts.length, d: `${Math.max(dashboardCharts.length - 1, 0)} secondary` },
-            { l: "columns", v: currentFile.columns.length, d: "schema ok" },
-            { l: "freshness", v: "live", d: "session active" },
+            { l: t("dashboard.stats.rowsAnalyzed"), v: currentFile.rows.toLocaleString(), d: t("dashboard.stats.rowsDelta") },
+            { l: t("dashboard.stats.viewsPinned"), v: dashboardCharts.length, d: t("dashboard.stats.secondary", { count: Math.max(dashboardCharts.length - 1, 0) }) },
+            { l: t("dashboard.stats.columns"), v: currentFile.columns.length, d: t("dashboard.stats.schemaOk") },
+            { l: t("dashboard.stats.freshness"), v: t("dashboard.stats.live"), d: t("dashboard.stats.sessionActive") },
           ].map((k) => (
             <div
               key={k.l}

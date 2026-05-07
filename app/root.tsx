@@ -1,3 +1,4 @@
+import "~/i18n";
 import {
   isRouteErrorResponse,
   Links,
@@ -8,6 +9,7 @@ import {
 } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { Route } from "./+types/root";
+import i18n from "~/i18n";
 import "./app.css";
 
 const queryClient = new QueryClient({
@@ -51,11 +53,11 @@ export default function App() {
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   let message = "Oops!";
-  let details = "Algo salió mal.";
+  let details = i18n.t("error.generic");
 
   if (isRouteErrorResponse(error)) {
     message = error.status === 404 ? "404" : "Error";
-    details = error.status === 404 ? "Página no encontrada." : error.statusText || details;
+    details = error.status === 404 ? i18n.t("error.notFound") : error.statusText || details;
   } else if (import.meta.env.DEV && error instanceof Error) {
     details = error.message;
   }

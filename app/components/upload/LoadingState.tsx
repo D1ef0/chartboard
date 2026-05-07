@@ -1,32 +1,19 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 interface LoadingStateProps {
   phase: "uploading" | "analyzing";
   onCancel?: () => void;
 }
 
-const MESSAGES_UPLOAD = [
-  "reading your file",
-  "detecting encoding",
-  "parsing rows",
-  "inferring column types",
-  "indexing data",
-  "building schema",
-];
-
-const MESSAGES_ANALYZE = [
-  "sampling your dataset",
-  "profiling columns",
-  "reasoning about structure",
-  "finding candidate views",
-  "scoring relevance",
-  "selecting best charts",
-  "writing insights",
-];
-
 export function LoadingState({ phase, onCancel }: LoadingStateProps) {
-  const messages = phase === "uploading" ? MESSAGES_UPLOAD : MESSAGES_ANALYZE;
+  const { t } = useTranslation();
+  const messages = t(
+    phase === "uploading" ? "loading.messagesUpload" : "loading.messagesAnalyze",
+    { returnObjects: true }
+  ) as string[];
+
   const [msgIndex, setMsgIndex] = useState(0);
 
   useEffect(() => {
@@ -43,12 +30,12 @@ export function LoadingState({ phase, onCancel }: LoadingStateProps) {
   }, [onCancel]);
 
   return (
-    <div className="max-w-[760px] mx-auto px-5 py-14">
+    <div className="max-w-[760px] mx-auto px-4 sm:px-5 py-8 sm:py-14">
       <div className="cb-mono text-[11px] tracking-wider" style={{ color: "var(--color-ink-4)" }}>
-        {phase === "uploading" ? "UPLOADING" : "ANALYZING"}
+        {phase === "uploading" ? t("loading.uploadLabel") : t("loading.analyzeLabel")}
       </div>
       <h2 className="text-[28px] font-semibold tracking-tight my-2 mb-4">
-        {phase === "uploading" ? "Reading your file" : "Reasoning over your data"}
+        {phase === "uploading" ? t("loading.uploadHeading") : t("loading.analyzeHeading")}
         <span className="cb-caret ml-1.5" />
       </h2>
 
@@ -88,7 +75,7 @@ export function LoadingState({ phase, onCancel }: LoadingStateProps) {
           className="mt-3.5 cb-mono text-[11px]"
           style={{ background: "none", border: "none", padding: 0, color: "var(--color-ink-4)" }}
         >
-          press <span className="cb-kbd">esc</span> to cancel
+          {t("loading.cancelHint")} <span className="cb-kbd">{t("loading.cancelKey")}</span> {t("loading.cancelSuffix")}
         </button>
       )}
     </div>
